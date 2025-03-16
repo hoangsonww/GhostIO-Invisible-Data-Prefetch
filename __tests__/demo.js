@@ -1,7 +1,7 @@
 import { GhostIO } from "ghost-io";
 import axios from "axios";
 
-// 1) Create a GhostIO instance
+// 1) Create a GhostIO instance with custom configuration
 const ghost = new GhostIO({
   maxCacheSize: 20,
   concurrencyLimit: 2,
@@ -9,22 +9,25 @@ const ghost = new GhostIO({
 });
 
 // 2) Integrate with an Axios instance
-const api = axios.create({ baseURL: "https://example.com" });
+const api = axios.create({ baseURL: "https://pokeapi.co/api/v2" });
 ghost.registerAxios({ instance: api });
 
-// 3) Prefetch some data manually
-ghost.prefetch("/api/users");
+// 3) Prefetch some data manually from the Pokémon API
+ghost.prefetch("/pokemon/ditto")
+  .then(() => console.log("Prefetched Pokémon data for Ditto"))
+  .catch((err) => console.error("Prefetch error:", err));
 
 // 4) In your HTML, mark links or buttons with data-prefetch attributes
-// <a data-prefetch="/api/dashboard" href="/dashboard">Go to Dashboard</a>
+// Example HTML snippet:
+// <a data-prefetch="/pokemon/pikachu" href="/pokemon/pikachu">View Pikachu</a>
+// GhostIO will automatically prefetch /pokemon/pikachu when the user hovers or scrolls near the element.
 
-// GhostIO will automatically prefetch /api/dashboard in the background
-// once the user hovers or scrolls near the link!
-
-// 5) If you want to retrieve the cached data manually:
-const cachedUsers = ghost.get("/api/users");
-if (cachedUsers) {
-  console.log("Loaded user data from prefetch cache:", cachedUsers);
-} else {
-  // fallback to normal fetch
-}
+// 5) Retrieve cached data manually
+setTimeout(() => {
+  const cachedData = ghost.get("/pokemon/ditto");
+  if (cachedData) {
+    console.log("Loaded Pokémon data from prefetch cache:", cachedData);
+  } else {
+    console.log("No cached data available; fetching fresh data...");
+  }
+}, 5000);
