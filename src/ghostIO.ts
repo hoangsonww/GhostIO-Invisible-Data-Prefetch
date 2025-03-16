@@ -56,7 +56,7 @@ export class GhostIO {
         // If already cached, short-circuit the request
         if (this.cache.has(url)) {
           console.log(
-            `[GhostIO] Short-circuiting axios request from cache: ${url}`
+            `[GhostIO] Short-circuiting axios request from cache: ${url}`,
           );
           const fakeResponse = {
             data: this.cache.get(url),
@@ -66,11 +66,11 @@ export class GhostIO {
             config,
             __ghostIOCache__: true,
           };
-          return Promise.reject(fakeResponse); // trigger short-circuit
+          return Promise.reject(fakeResponse);
         }
         return config;
       },
-      (error: any) => Promise.reject(error)
+      (error: any) => Promise.reject(error),
     );
 
     // Intercept responses
@@ -83,50 +83,53 @@ export class GhostIO {
       },
       (error: any) => {
         if (error && error.__ghostIOCache__) {
-          // Return the short-circuited cached data
           return Promise.resolve(error);
         }
         return Promise.reject(error);
-      }
+      },
     );
     console.log("[GhostIO] Axios integrated successfully.");
   }
 
   async prefetch(url: string): Promise<void> {
-    if (this.cache.has(url)) {
-      console.log(`[GhostIO] Prefetch skipped; already in cache: ${url}`);
+    // Use the input URL as-is (user must provide full URL)
+    const finalURL = url;
+
+    if (this.cache.has(finalURL)) {
+      console.log(`[GhostIO] Prefetch skipped; already in cache: ${finalURL}`);
       return;
     }
-    if (this.inFlight.has(url)) {
-      console.log(`[GhostIO] Prefetch skipped; already in-flight: ${url}`);
+    if (this.inFlight.has(finalURL)) {
+      console.log(`[GhostIO] Prefetch skipped; already in-flight: ${finalURL}`);
       return;
     }
     if (this.currentRequestsCount >= this.config.concurrencyLimit) {
       console.log(
         "[GhostIO] Concurrency limit reached; deferring prefetch:",
-        url
+        finalURL,
       );
       return;
     }
 
-    console.log("[GhostIO] Prefetching:", url);
-    this.inFlight.add(url);
+    console.log("[GhostIO] Prefetching:", finalURL);
+    this.inFlight.add(finalURL);
     this.currentRequestsCount++;
 
     try {
-      const response = await axios.get(url);
-      this.storeInCache(url, response.data);
-      console.log("[GhostIO] Prefetch succeeded for:", url);
+      const response = await axios.get(finalURL);
+      this.storeInCache(finalURL, response.data);
+      console.log("[GhostIO] Prefetch succeeded for:", finalURL);
     } catch (err) {
-      console.warn("[GhostIO] Failed to prefetch:", url, err);
+      console.warn("[GhostIO] Failed to prefetch:", finalURL, err);
     } finally {
-      this.inFlight.delete(url);
+      this.inFlight.delete(finalURL);
       this.currentRequestsCount--;
     }
   }
 
   get(url: string) {
-    return this.cache.has(url) ? this.cache.get(url) : null;
+    const finalURL = url;
+    return this.cache.has(finalURL) ? this.cache.get(finalURL) : null;
   }
 
   clearCache(): void {
@@ -139,12 +142,11 @@ export class GhostIO {
     console.log("[GhostIO] Stored in cache:", url);
     if (this.cache.size > this.config.maxCacheSize) {
       const oldestKey = this.cache.keys().next().value;
-      // Remove the oldest entry
       // @ts-ignore
       this.cache.delete(oldestKey);
       console.log(
         "[GhostIO] Cache exceeded max size; removed oldest entry:",
-        oldestKey
+        oldestKey,
       );
     }
   }
@@ -174,7 +176,7 @@ export class GhostIO {
         clearTimeout(idleTimeout);
         idleTimeout = setTimeout(
           () => this.idlePrefetch(),
-          this.config.idlePrefetchDelay
+          this.config.idlePrefetchDelay,
         );
       };
       document.addEventListener("mousemove", resetTimer);
@@ -190,7 +192,10 @@ export class GhostIO {
     if (!target) return;
     const url = target.getAttribute("data-prefetch");
     if (url) {
-      console.log("[GhostIO] Detected hover on element with data-prefetch:", url);
+      console.log(
+        "[GhostIO] Detected hover on element with data-prefetch:",
+        url,
+      );
       this.prefetch(url);
     }
   }
@@ -202,7 +207,10 @@ export class GhostIO {
       if (rect.top < window.innerHeight * 1.5) {
         const url = el.getAttribute("data-prefetch");
         if (url) {
-          console.log("[GhostIO] Element in view during scroll with data-prefetch:", url);
+          console.log(
+            "[GhostIO] Element in view during scroll with data-prefetch:",
+            url,
+          );
           this.prefetch(url);
         }
       }
@@ -210,12 +218,12 @@ export class GhostIO {
   }
 
   private idlePrefetch() {
-    console.log("[GhostIO] User idle detected; running background prefetch tasks.");
+    console.log(
+      "[GhostIO] User idle detected; running background prefetch tasks.",
+    );
     document.querySelectorAll("[data-prefetch]").forEach((el) => {
       const url = el.getAttribute("data-prefetch");
-      if (url) {
-        this.prefetch(url);
-      }
+      if (url) this.prefetch(url);
     });
   }
 }
