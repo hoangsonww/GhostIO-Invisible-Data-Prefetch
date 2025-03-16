@@ -14,7 +14,7 @@ const defaultConfig: InternalConfig = {
   prefetchOnHover: true,
   prefetchOnScroll: true,
   idlePrefetchDelay: 5000,
-  concurrencyLimit: 3
+  concurrencyLimit: 3,
 };
 
 export class GhostIO {
@@ -46,23 +46,28 @@ export class GhostIO {
     this.axiosRegisteredInstances.add(instance);
 
     // Intercept requests
-    instance.interceptors.request.use(async (config: any) => {
-      const url = config.url || "";
-      // If already cached, short-circuit
-      if (this.cache.has(url)) {
-        console.log(`[GhostIO] Short-circuiting axios request from cache: ${url}`);
-        const fakeResponse = {
-          data: this.cache.get(url),
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config,
-          __ghostIOCache__: true
-        };
-        return Promise.reject(fakeResponse); // cause short-circuit
-      }
-      return config;
-    }, (error: any) => Promise.reject(error));
+    instance.interceptors.request.use(
+      async (config: any) => {
+        const url = config.url || "";
+        // If already cached, short-circuit
+        if (this.cache.has(url)) {
+          console.log(
+            `[GhostIO] Short-circuiting axios request from cache: ${url}`,
+          );
+          const fakeResponse = {
+            data: this.cache.get(url),
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config,
+            __ghostIOCache__: true,
+          };
+          return Promise.reject(fakeResponse); // cause short-circuit
+        }
+        return config;
+      },
+      (error: any) => Promise.reject(error),
+    );
 
     // Intercept responses
     instance.interceptors.response.use(
@@ -78,7 +83,7 @@ export class GhostIO {
           return Promise.resolve(error);
         }
         return Promise.reject(error);
-      }
+      },
     );
     console.log("[GhostIO] Axios integrated successfully.");
   }
@@ -93,7 +98,10 @@ export class GhostIO {
       return;
     }
     if (this.currentRequestsCount >= this.config.concurrencyLimit) {
-      console.log("[GhostIO] Concurrency limit reached; deferring prefetch:", url);
+      console.log(
+        "[GhostIO] Concurrency limit reached; deferring prefetch:",
+        url,
+      );
       return;
     }
 
@@ -129,7 +137,10 @@ export class GhostIO {
       const oldestKey = this.cache.keys().next().value;
       // @ts-ignore
       this.cache.delete(oldestKey);
-      console.log("[GhostIO] Cache exceeded max size; removed oldest entry:", oldestKey);
+      console.log(
+        "[GhostIO] Cache exceeded max size; removed oldest entry:",
+        oldestKey,
+      );
     }
   }
 
@@ -154,7 +165,10 @@ export class GhostIO {
       let idleTimeout: NodeJS.Timeout;
       const resetTimer = () => {
         clearTimeout(idleTimeout);
-        idleTimeout = setTimeout(() => this.idlePrefetch(), this.config.idlePrefetchDelay);
+        idleTimeout = setTimeout(
+          () => this.idlePrefetch(),
+          this.config.idlePrefetchDelay,
+        );
       };
       document.addEventListener("mousemove", resetTimer);
       document.addEventListener("keypress", resetTimer);
@@ -188,7 +202,9 @@ export class GhostIO {
   }
 
   private idlePrefetch() {
-    console.log("[GhostIO] User idle detected; running background prefetch tasks.");
+    console.log(
+      "[GhostIO] User idle detected; running background prefetch tasks.",
+    );
     document.querySelectorAll("[data-prefetch]").forEach((el) => {
       const url = el.getAttribute("data-prefetch");
       if (url) this.prefetch(url);

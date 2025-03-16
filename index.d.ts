@@ -1,13 +1,13 @@
 export interface GhostIOConfig {
-  maxCacheSize?: number;        // max items to store in memory
-  prefetchOnHover?: boolean;    // fetch on element hover
-  prefetchOnScroll?: boolean;   // fetch on scroll proximity
-  idlePrefetchDelay?: number;   // ms to wait after user idle to prefetch
-  concurrencyLimit?: number;    // limit concurrent prefetch requests
+  maxCacheSize?: number; // max items to store in memory
+  prefetchOnHover?: boolean; // fetch on element hover
+  prefetchOnScroll?: boolean; // fetch on scroll proximity
+  idlePrefetchDelay?: number; // ms to wait after user idle to prefetch
+  concurrencyLimit?: number; // limit concurrent prefetch requests
 }
 
 export interface AxiosIntegrationOptions {
-  instance: any;               // user-provided Axios instance
+  instance: any; // user-provided Axios instance
 }
 
 export declare class GhostIO {

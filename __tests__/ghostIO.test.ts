@@ -11,7 +11,7 @@ describe("GhostIO", () => {
     };
     ghost = new GhostIO({
       maxCacheSize: 2,
-      concurrencyLimit: 1
+      concurrencyLimit: 1,
     });
   });
 

@@ -23,16 +23,16 @@
     "invisible",
     "ghostIO"
   ],
-  "author": "Your Name <you@example.com>",
+  "author": "Son Nguyen",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/ghost-io.git"
+    "url": "https://github.com/hoangsonww/GhostIO-Invisible-Data-Prefetch.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/ghost-io/issues"
+    "url": "https://github.com/hoangsonww/GhostIO-Invisible-Data-Prefetch/issues"
   },
-  "homepage": "https://github.com/yourusername/ghost-io#readme",
+  "homepage": "https://github.com/hoangsonww/GhostIO-Invisible-Data-Prefetch#readme",
   "devDependencies": {
     "@types/jest": "^29.0.0",
     "jest": "^29.0.0",
