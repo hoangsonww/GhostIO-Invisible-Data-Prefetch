@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    // Node’s next-gen ESM
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2020",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Output
+    "outDir": "./dist",
+    "rootDir": "./src",
+
+    // Generate .d.ts for external use
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "**/__tests__"]
+}
