@@ -1,7 +1,7 @@
 {
   "name": "ghost-io",
   "displayName": "GhostIO Invisible Background Fetcher",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Invisible Background Data Fetching & Prefetching library that uses heuristics (hover, scroll, idle) to speed up your SPA or dashboard.",
   "type": "module",
   "main": "dist/index.js",
